@@ -3,6 +3,7 @@
 */
 
 #include "ds_vector.h"
+#include "ds_list.h"
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -66,7 +67,7 @@ static void count_free(void *p) {
     free_count++;
 }
 
-/* ------------ Test Function ------------ */
+/* ------------ Test Function: Vector ------------ */
 TEST_FUNC(test_vector) {
     // 1. Creation
     ds_vector_t *vec = ds_vector_create(2); // 小容量以触发扩容
@@ -122,9 +123,80 @@ TEST_FUNC(test_vector) {
     ASSERT_EQ(free_count, 2, "Destroy should free remaining elements");
 }
 
+/* ------------ Test Function: List ------------ */
+TEST_FUNC(test_list) {
+    // 1. Creation
+    ds_list_t *list = ds_list_create();
+    ASSERT_NOT_NULL(list, "List creation failed");
+    ASSERT_EQ(ds_list_size(list), 0, "Initial size 0");
+
+    // 2. Push Back & Front [10, 20, 30] -> [5, 10, 20, 30]
+    ds_list_push_back(list, new_int(10));
+    ds_list_push_back(list, new_int(20));
+    ds_list_push_back(list, new_int(30));
+    ds_list_push_front(list, new_int(5));
+    ASSERT_EQ(ds_list_size(list), 4, "Size after pushes");
+
+    // 3. Iteration (Forward)
+    ds_list_iter_t it = ds_list_iter_begin(list);
+    int *val = (int *)ds_list_iter_get(it);
+    ASSERT_EQ(*val, 5, "First element check");
+    
+    it = ds_list_iter_next(it); // -> 10
+    it = ds_list_iter_next(it); // -> 20
+    val = (int *)ds_list_iter_get(it);
+    ASSERT_EQ(*val, 20, "Third element check");
+
+    // 4. Reverse Iteration (Tail)
+    it = ds_list_iter_tail(list);
+    val = (int *)ds_list_iter_get(it);
+    ASSERT_EQ(*val, 30, "Tail element check");
+    
+    it = ds_list_iter_prev(it); // -> 20
+    val = (int *)ds_list_iter_get(it);
+    ASSERT_EQ(*val, 20, "Prev element check");
+
+    // 5. Insert Middle: Insert 15 before 20. List: [5, 10, 15, 20, 30]
+    // Current 'it' points to 20
+    ds_list_insert(list, it, new_int(15));
+    ASSERT_EQ(ds_list_size(list), 5, "Size after insert");
+    
+    it = ds_list_iter_prev(it); // Should point to new 15
+    val = (int *)ds_list_iter_get(it);
+    ASSERT_EQ(*val, 15, "Check inserted value");
+
+    // 6. Remove Middle: Remove 15. List: [5, 10, 20, 30]
+    free_count = 0;
+    it = ds_list_remove(list, it, count_free); 
+    // Remove returns iterator to next element (20)
+    ASSERT_EQ(free_count, 1, "Removed element freed");
+    ASSERT_EQ(ds_list_size(list), 4, "Size after remove");
+    
+    val = (int *)ds_list_iter_get(it);
+    ASSERT_EQ(*val, 20, "Return iterator check");
+
+    // 7. Remove Head/Tail via Pop
+    int *head_val = (int *)ds_list_pop_front(list); // Pop 5
+    ASSERT_EQ(*head_val, 5, "Pop front check");
+    free(head_val);
+
+    int *tail_val = (int *)ds_list_pop_back(list); // Pop 30
+    ASSERT_EQ(*tail_val, 30, "Pop back check");
+    free(tail_val);
+
+    // 8. Clear
+    free_count = 0;
+    ds_list_clear(list, count_free);
+    ASSERT_EQ(ds_list_size(list), 0, "Size after clear");
+    ASSERT_EQ(free_count, 2, "Clear freed remaining elements"); // 10 and 20
+
+    ds_list_destroy(list, NULL);
+}
+
 int main() {
   test_case_t tests[] = {
   {"test_vector", test_vector},
+    {"test_list", test_list},
   };
 
   return run_tests(tests, sizeof(tests)/sizeof(tests[0]));
