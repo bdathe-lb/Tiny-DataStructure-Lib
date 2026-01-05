@@ -50,6 +50,14 @@ $(BUILD_DIR):
 # Import dependence file
 -include $(DEPS)
 
+# Detect MemoryLeak 
+mem-check: all
+	@valgrind \
+		--tool=memcheck \
+		--leak-check=full \
+		--show-leak-kinds=all \
+		./$(BUILD_DIR)/$(TARGET_EXEC)
+
 # Run
 run: all
 	@./$(BUILD_DIR)/$(TARGET_EXEC)

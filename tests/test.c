@@ -4,6 +4,7 @@
 
 #include "ds_vector.h"
 #include "ds_list.h"
+#include "ds_deque.h"
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -193,10 +194,76 @@ TEST_FUNC(test_list) {
     ds_list_destroy(list, NULL);
 }
 
+/* ------------ Test Function: Deque ------------ */
+TEST_FUNC(test_deque) {
+    // 1. Creation
+    ds_deque_t *dq = ds_deque_create(4);
+    ASSERT_NOT_NULL(dq, "Deque creation failed");
+    ASSERT_EQ(ds_deque_size(dq), 0, "Initial size 0");
+    ASSERT_EQ(ds_deque_capacity(dq), 4, "Initial capacity check");
+
+    // 2. Basic Push Back/Front
+    // State: [2, 1]
+    ds_deque_push_back(dq, new_int(1));
+    ds_deque_push_front(dq, new_int(2));
+    
+    int *front = (int *)ds_deque_front(dq);
+    int *back = (int *)ds_deque_back(dq);
+    ASSERT_EQ(*front, 2, "Front should be 2");
+    ASSERT_EQ(*back, 1, "Back should be 1");
+    ASSERT_EQ(ds_deque_size(dq), 2, "Size check");
+
+    // 3. Trigger Resize (Capacity 4 -> 8)
+    // Push 3, 4, 5. Total 5 elements > 4
+    ds_deque_push_back(dq, new_int(3));
+    ds_deque_push_back(dq, new_int(4));
+    ds_deque_push_back(dq, new_int(5)); 
+    // Current logical: [2, 1, 3, 4, 5]
+    
+    ASSERT_EQ(ds_deque_size(dq), 5, "Size after resize");
+    ASSERT_EQ(ds_deque_capacity(dq), 8, "Capacity doubled");
+
+    // Verify order after resize (Linearization check)
+    front = (int *)ds_deque_front(dq);
+    ASSERT_EQ(*front, 2, "Front preserved after resize");
+    
+    // 4. Test Wrap-around logic
+    // Pop front 2 elements. [3, 4, 5]
+    free(ds_deque_pop_front(dq)); // 2
+    free(ds_deque_pop_front(dq)); // 1
+    
+    // Now internal head has moved. 
+    // Push back to force tail wrap around if implementation is circular
+    ds_deque_push_back(dq, new_int(6));
+    ds_deque_push_back(dq, new_int(7));
+    ds_deque_push_back(dq, new_int(8));
+    // Logical: [3, 4, 5, 6, 7, 8]
+    
+    front = (int *)ds_deque_front(dq);
+    back = (int *)ds_deque_back(dq);
+    ASSERT_EQ(*front, 3, "New front is 3");
+    ASSERT_EQ(*back, 8, "New back is 8");
+
+    // 5. Mixed Pop
+    int *val = (int *)ds_deque_pop_back(dq); // 8
+    ASSERT_EQ(*val, 8, "Pop back check");
+    free(val);
+    
+    val = (int *)ds_deque_pop_front(dq); // 3
+    ASSERT_EQ(*val, 3, "Pop front check");
+    free(val);
+
+    // 6. Clear & Destroy
+    free_count = 0;
+    ds_deque_destroy(dq, count_free);
+    ASSERT_EQ(free_count, 4, "Remaining elements freed"); // 4, 5, 6, 7
+}
+
 int main() {
   test_case_t tests[] = {
   {"test_vector", test_vector},
     {"test_list", test_list},
+    {"test_deque", test_deque},
   };
 
   return run_tests(tests, sizeof(tests)/sizeof(tests[0]));
