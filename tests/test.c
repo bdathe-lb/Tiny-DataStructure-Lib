@@ -5,6 +5,8 @@
 #include "ds_vector.h"
 #include "ds_list.h"
 #include "ds_deque.h"
+#include "ds_stack.h"
+#include "ds_queue.h"
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -259,11 +261,73 @@ TEST_FUNC(test_deque) {
     ASSERT_EQ(free_count, 4, "Remaining elements freed"); // 4, 5, 6, 7
 }
 
+/* ------------ Test Function: Stack ------------ */
+TEST_FUNC(test_stack) {
+    ds_stack_t *s = ds_stack_create(4);
+    ASSERT_NOT_NULL(s, "Stack creation");
+
+    // LIFO Test: Push 10, 20, 30
+    ds_stack_push(s, new_int(10));
+    ds_stack_push(s, new_int(20));
+    ds_stack_push(s, new_int(30));
+
+    ASSERT_EQ(ds_stack_size(s), 3, "Stack size check");
+    
+    // Top check
+    int *val = (int *)ds_stack_top(s);
+    ASSERT_EQ(*val, 30, "Stack top should be 30");
+
+    // Pop check: 30 -> 20 -> 10
+    free(ds_stack_pop(s)); // Pop 30
+    val = (int *)ds_stack_top(s);
+    ASSERT_EQ(*val, 20, "Stack top should be 20");
+    
+    free(ds_stack_pop(s)); // Pop 20
+    free(ds_stack_pop(s)); // Pop 10
+
+    ASSERT_EQ(ds_stack_size(s), 0, "Stack empty check");
+    ASSERT_NULL(ds_stack_pop(s), "Pop empty stack");
+
+    ds_stack_destroy(s, NULL);
+}
+
+/* ------------ Test Function: Queue ------------ */
+TEST_FUNC(test_queue) {
+    ds_queue_t *q = ds_queue_create(4);
+    ASSERT_NOT_NULL(q, "Queue creation");
+
+    // FIFO Test: Push 10, 20, 30
+    ds_queue_push(q, new_int(10));
+    ds_queue_push(q, new_int(20));
+    ds_queue_push(q, new_int(30));
+
+    ASSERT_EQ(ds_queue_size(q), 3, "Queue size check");
+
+    // Front check
+    int *val = (int *)ds_queue_front(q);
+    ASSERT_EQ(*val, 10, "Queue front should be 10");
+
+    // Dequeue check: 10 -> 20 -> 30
+    free(ds_queue_pop(q)); // Pop 10
+    val = (int *)ds_queue_front(q);
+    ASSERT_EQ(*val, 20, "Queue front should be 20");
+
+    free(ds_queue_pop(q)); // Pop 20
+    free(ds_queue_pop(q)); // Pop 30
+
+    ASSERT_EQ(ds_queue_size(q), 0, "Queue empty check");
+    ASSERT_NULL(ds_queue_pop(q), "Pop empty queue");
+
+    ds_queue_destroy(q, NULL);
+}
+
 int main() {
   test_case_t tests[] = {
   {"test_vector", test_vector},
     {"test_list", test_list},
     {"test_deque", test_deque},
+    {"test_stack", test_stack},
+    {"test_queue", test_queue},
   };
 
   return run_tests(tests, sizeof(tests)/sizeof(tests[0]));
