@@ -7,6 +7,7 @@
 #include "ds_deque.h"
 #include "ds_stack.h"
 #include "ds_queue.h"
+#include "ds_heap.h"
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -321,6 +322,100 @@ TEST_FUNC(test_queue) {
     ds_queue_destroy(q, NULL);
 }
 
+/**
+ * @brief Min Heap Comparator
+ * Logic: We want smaller numbers to come "before" (at the top).
+ * If a < b (e.g. 10 < 20), result should be < 0.
+ * Calculation: a - b
+ */
+static int int_compare_min(const void *a, const void *b) {
+    int va = *(const int *)a;
+    int vb = *(const int *)b;
+    return va - vb;
+}
+
+/**
+ * @brief Max Heap Comparator
+ * Logic: We want larger numbers to come "before" (at the top).
+ * If a > b (e.g. 20 > 10), result should be < 0.
+ * Calculation: b - a
+ */
+static int int_compare_max(const void *a, const void *b) {
+    int va = *(const int *)a;
+    int vb = *(const int *)b;
+    return vb - va; 
+}
+
+/* ------------ Test Function: Heap ------------ */
+TEST_FUNC(test_heap) {
+    // 1. Test Min Heap
+    // -----------------------------------------------------
+    ds_heap_t *min_heap = ds_heap_create(int_compare_min, 4);
+    ASSERT_NOT_NULL(min_heap, "Min Heap creation");
+
+    // Insert mixed: 50, 10, 30, 5, 20
+    ds_heap_push(min_heap, new_int(50));
+    ds_heap_push(min_heap, new_int(10));
+    ds_heap_push(min_heap, new_int(30));
+    ds_heap_push(min_heap, new_int(5));
+    ds_heap_push(min_heap, new_int(20));
+
+    ASSERT_EQ(ds_heap_size(min_heap), 5, "Min Heap size check");
+
+    // Check Top (Should be 5)
+    int *top = (int *)ds_heap_top(min_heap);
+    ASSERT_EQ(*top, 5, "Min Heap top should be 5");
+
+    // Pop Sequence: 5 -> 10 -> 20 -> 30 -> 50
+    int expected_min[] = {5, 10, 20, 30, 50};
+    for (int i = 0; i < 5; ++i) {
+        int *val = (int *)ds_heap_pop(min_heap);
+        ASSERT_EQ(*val, expected_min[i], "Min Heap pop order");
+        free(val);
+    }
+    ASSERT(ds_heap_is_empty(min_heap), "Min Heap should be empty");
+    ds_heap_destroy(min_heap, NULL);
+
+    // 2. Test Max Heap
+    // -----------------------------------------------------
+    ds_heap_t *max_heap = ds_heap_create(int_compare_max, 4);
+    ASSERT_NOT_NULL(max_heap, "Max Heap creation");
+
+    // Insert mixed: 10, 50, 30, 5, 100
+    ds_heap_push(max_heap, new_int(10));
+    ds_heap_push(max_heap, new_int(50));
+    ds_heap_push(max_heap, new_int(30));
+    ds_heap_push(max_heap, new_int(5));
+    ds_heap_push(max_heap, new_int(100)); // Should bubble to top
+
+    // Check Top (Should be 100)
+    top = (int *)ds_heap_top(max_heap);
+    ASSERT_EQ(*top, 100, "Max Heap top should be 100");
+
+    // Pop Sequence: 100 -> 50 -> 30 -> 10 -> 5
+    int expected_max[] = {100, 50, 30, 10, 5};
+    for (int i = 0; i < 5; ++i) {
+        int *val = (int *)ds_heap_pop(max_heap);
+        ASSERT_EQ(*val, expected_max[i], "Max Heap pop order");
+        free(val);
+    }
+
+    ds_heap_destroy(max_heap, NULL);
+
+    // 3. Test Clear
+    // -----------------------------------------------------
+    ds_heap_t *h = ds_heap_create(int_compare_min, 4);
+    ds_heap_push(h, new_int(1));
+    ds_heap_push(h, new_int(2));
+    
+    free_count = 0;
+    ds_heap_clear(h, count_free);
+    ASSERT_EQ(ds_heap_size(h), 0, "Size after clear");
+    ASSERT_EQ(free_count, 2, "Elements should be freed");
+    
+    ds_heap_destroy(h, NULL);
+}
+
 int main() {
   test_case_t tests[] = {
   {"test_vector", test_vector},
@@ -328,6 +423,7 @@ int main() {
     {"test_deque", test_deque},
     {"test_stack", test_stack},
     {"test_queue", test_queue},
+    {"test_heap", test_heap},
   };
 
   return run_tests(tests, sizeof(tests)/sizeof(tests[0]));

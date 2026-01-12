@@ -24,7 +24,9 @@ typedef enum {
 // Memory release callback function.
 typedef void (*ds_free_f)(void *data);
 // Element size comparison callback function.
-// Return -1 if a < b; returns 0 if a == b; returns 1 if a > b.
+// Return value < 0: a comes before b.  
+// Return value = 0: a is equal to b.  
+// Return value > 0: a comes after b.
 typedef int (*ds_compare_f)(const void *a, const void *b);
 //Element printing/debugging callback function. 
 typedef void (*ds_print_f)(void *data);
