@@ -67,7 +67,7 @@ bool ds_list_is_empty(const ds_list_t *list);
  *
  * @return 
  *  - DS_OK         On success.
- *  - DS_ERR_BOUNDS Invalid parameters.
+ *  - DS_ERR_*      On failure.
  */
 ds_status_t ds_list_set(ds_list_t *list, ds_list_iter_t it, void *element, ds_free_f old_element_free);
 
@@ -77,10 +77,9 @@ ds_status_t ds_list_set(ds_list_t *list, ds_list_iter_t it, void *element, ds_fr
  * @param list     Pointer to the list.
  * @param element  Pointer to the element to append.
  *
- * @return
- *   - DS_OK         On success.
- *   - DS_ERR_BOUNDS Invalid parameters.
- *   - DS_ERR_MEM    Memory allocation fails.
+ * @return 
+ *  - DS_OK         On success.
+ *  - DS_ERR_*      On failure.
  */
 ds_status_t ds_list_push_back(ds_list_t *list, void *element);
 
@@ -90,10 +89,9 @@ ds_status_t ds_list_push_back(ds_list_t *list, void *element);
  * @param list     Pointer to the list.
  * @param element  Pointer to the element to append.
  *
- * @return
- *   - DS_OK         On success.
- *   - DS_ERR_BOUNDS Invalid parameters.
- *   - DS_ERR_MEM    Memory allocation fails.
+ * @return 
+ *  - DS_OK         On success.
+ *  - DS_ERR_*      On failure.
  */
 ds_status_t ds_list_push_front(ds_list_t *list, void *element);
 
@@ -107,10 +105,9 @@ ds_status_t ds_list_push_front(ds_list_t *list, void *element);
  *                 - Otherwise, insert a new node before the node pointed to by it.
  * @param element  Pointer to the element to insert.
  *
- * @return
- *   - DS_OK         On success.
- *   - DS_ERR_BOUNDS Invalid parameters.
- *   - DS_ERR_MEM    Memory allocation fails.
+ * @return 
+ *  - DS_OK         On success.
+ *  - DS_ERR_*      On failure.
  */
 ds_status_t ds_list_insert(ds_list_t *list, ds_list_iter_t it, void *element);
 

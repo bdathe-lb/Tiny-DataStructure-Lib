@@ -55,8 +55,7 @@ bool ds_queue_is_empty(ds_queue_t *queue);
  *
  * @return
  *   - DS_OK         On success.
- *   - DS_ERR_BOUNDS Invalid parameters.
- *   - DS_ERR_MEM    Memory allocation fails.
+ *   - DS_ERR_*      On failure.
  */
 ds_status_t ds_queue_push(ds_queue_t *queue, void *element);
 

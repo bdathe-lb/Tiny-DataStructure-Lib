@@ -113,8 +113,7 @@ ds_deque_t *ds_deque_create(size_t capacity_hint) {
  */
 void ds_deque_destroy(ds_deque_t *deque, ds_free_f free_func) {
   // Check input parameters
-  if (!deque)
-    return;
+  if (!deque) return;
 
   // Traverse each element for free
   if (free_func) {
@@ -134,8 +133,7 @@ void ds_deque_destroy(ds_deque_t *deque, ds_free_f free_func) {
  */
 size_t ds_deque_size(const ds_deque_t *deque) {
   // Check input parameters
-  if (!deque)
-    return 0;
+  if (!deque) return 0;
 
   return deque->size;
 }
@@ -145,8 +143,7 @@ size_t ds_deque_size(const ds_deque_t *deque) {
  */
 size_t ds_deque_capacity(const ds_deque_t *deque) {
   // Check input parameters
-  if (!deque)
-    return 0;
+  if (!deque) return 0;
 
   return deque->capacity;
 }
@@ -156,8 +153,7 @@ size_t ds_deque_capacity(const ds_deque_t *deque) {
  */
 bool ds_deque_is_empty(const ds_deque_t *deque) {
   // Check input parameters
-  if (!deque)
-    return true;
+  if (!deque) return true;
 
   return deque->size == 0;
 }
@@ -170,13 +166,12 @@ bool ds_deque_is_empty(const ds_deque_t *deque) {
  *
  * @return
  *   - DS_OK         On success.
- *   - DS_ERR_BOUNDS Invalid parameters.
- *   - DS_ERR_MEM    Memory allocation fails.
+ *   - DS_ERR_*      On failure.
  */
 ds_status_t ds_deque_push_back(ds_deque_t *deque, void *element) {
   // Check input parameters
-  if (!deque || !element)
-    return DS_ERR_BOUNDS;
+  if (!deque) return DS_ERR_NULL;
+  if (!element) return DS_ERR_ARG;
 
   // Check deque if is full
   if (deque->size == deque->capacity) {
@@ -202,13 +197,12 @@ ds_status_t ds_deque_push_back(ds_deque_t *deque, void *element) {
  *
  * @return
  *   - DS_OK         On success.
- *   - DS_ERR_BOUNDS Invalid parameters.
- *   - DS_ERR_MEM    Memory allocation fails.
+ *   - DS_ERR_*      On failure.
  */
 ds_status_t ds_deque_push_front(ds_deque_t *deque, void *element) {
   // Check input parameters
-  if (!deque || !element)
-    return DS_ERR_BOUNDS;
+  if (!deque) return DS_ERR_NULL;
+  if (!element) return DS_ERR_ARG;
 
   // Check deque if is full
   if (deque->size == deque->capacity) {
@@ -238,8 +232,7 @@ ds_status_t ds_deque_push_front(ds_deque_t *deque, void *element) {
  */
 void *ds_deque_pop_back(ds_deque_t *deque) {
   // Check input parameters
-  if (!deque)
-    return NULL;
+  if (!deque) return NULL;
 
   // Check if the deque is empty
   if (deque->size == 0)
@@ -262,8 +255,7 @@ void *ds_deque_pop_back(ds_deque_t *deque) {
  */
 void *ds_deque_pop_front(ds_deque_t *deque) {
   // Check input parameters
-  if (!deque)
-    return NULL;
+  if (!deque) return NULL;
 
   // Check if the deque is empty
   if (deque->size == 0)
@@ -288,12 +280,10 @@ void *ds_deque_pop_front(ds_deque_t *deque) {
  */
 void *ds_deque_front(const ds_deque_t *deque) {
   // Check input parameters
-  if (!deque)
-    return NULL;
+  if (!deque) return NULL;
 
   // Check if the deque is empty
-  if (deque->size == 0)
-    return NULL;
+  if (deque->size == 0) return NULL;
 
   return deque->items[deque->head];
 }
@@ -310,12 +300,10 @@ void *ds_deque_front(const ds_deque_t *deque) {
  */
 void *ds_deque_back(const ds_deque_t *deque) {
   // Check input parameters
-  if (!deque)
-    return NULL;
+  if (!deque) return NULL;
 
   // Check if the deque is empty
-  if (deque->size == 0)
-    return NULL;
+  if (deque->size == 0) return NULL;
 
   return deque->items[prev_idx(deque->tail, deque->capacity)];
 }
@@ -331,8 +319,7 @@ void *ds_deque_back(const ds_deque_t *deque) {
  */
 void ds_deque_clear(ds_deque_t *deque, ds_free_f free_func) {
   // Check input parameters
-  if (!deque)
-    return;
+  if (!deque) return;
 
   // Traverse each element for free
   if (free_func) {

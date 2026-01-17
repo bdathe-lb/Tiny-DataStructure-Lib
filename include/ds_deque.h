@@ -55,8 +55,7 @@ bool ds_deque_is_empty(const ds_deque_t *deque);
  *
  * @return
  *   - DS_OK         On success.
- *   - DS_ERR_BOUNDS Invalid parameters.
- *   - DS_ERR_MEM    Memory allocation fails.
+ *   - DS_ERR_*      On failure.
  */
 ds_status_t ds_deque_push_back(ds_deque_t *deque, void *element);
 
@@ -68,8 +67,7 @@ ds_status_t ds_deque_push_back(ds_deque_t *deque, void *element);
  *
  * @return
  *   - DS_OK         On success.
- *   - DS_ERR_BOUNDS Invalid parameters.
- *   - DS_ERR_MEM    Memory allocation fails.
+ *   - DS_ERR_*      On failure.
  */
 ds_status_t ds_deque_push_front(ds_deque_t *deque, void *element);
 

@@ -18,12 +18,13 @@ struct ds_queue {
  */
 ds_queue_t *ds_queue_create(size_t capacity_hint) {
   ds_queue_t *queue = malloc(sizeof(ds_queue_t));
-  if (!queue)
-    return NULL;
+  if (!queue) return NULL;
 
   queue->deque = ds_deque_create(capacity_hint);
-  if (!queue->deque)
+  if (!queue->deque) {
+    free(queue);
     return NULL;
+  } 
 
   return queue;
 }
@@ -37,18 +38,17 @@ ds_queue_t *ds_queue_create(size_t capacity_hint) {
  *                   - If NULL, only the queue itself is freed.
  */
 void ds_queue_destroy(ds_queue_t *queue, ds_free_f free_func) {
-  if (!queue)
-    return;
+  if (!queue) return;
 
   ds_deque_destroy(queue->deque, free_func);
+  free(queue);
 }
 
 /**
  * @brief Get the current number of elements.
  */
 size_t ds_queue_size(const ds_queue_t *queue) {
-  if (!queue)
-    return 0;
+  if (!queue) return 0;
 
   return ds_deque_size(queue->deque);
 }
@@ -57,8 +57,7 @@ size_t ds_queue_size(const ds_queue_t *queue) {
  * @brief Get the currently allocated capacity.
  */
 size_t ds_queue_capacity(const ds_queue_t *queue) {
-  if (!queue)
-    return 0;
+  if (!queue) return 0;
 
   return ds_deque_capacity(queue->deque);
 }
@@ -67,8 +66,7 @@ size_t ds_queue_capacity(const ds_queue_t *queue) {
  * @brief Check if the queue is empty.
  */
 bool ds_queue_is_empty(ds_queue_t *queue) {
-  if (!queue)
-    return true;
+  if (!queue) return true;
 
   return ds_deque_is_empty(queue->deque);
 }
@@ -81,12 +79,11 @@ bool ds_queue_is_empty(ds_queue_t *queue) {
  *
  * @return
  *   - DS_OK         On success.
- *   - DS_ERR_BOUNDS Invalid parameters.
- *   - DS_ERR_MEM    Memory allocation fails.
+ *   - DS_ERR_*      On failure.
  */
 ds_status_t ds_queue_push(ds_queue_t *queue, void *element) {
-  if (!queue || !element) 
-    return DS_ERR_BOUNDS;
+  if (!queue) return DS_ERR_NULL;
+  if (!element) return DS_ERR_ARG;
 
   return ds_deque_push_back(queue->deque, element);
 }
@@ -102,8 +99,7 @@ ds_status_t ds_queue_push(ds_queue_t *queue, void *element) {
  * @return Pointer to the removed element, or NULL if the queue is empty.
  */
 void *ds_queue_pop(ds_queue_t *queue) {
-  if (!queue)
-    return NULL;
+  if (!queue) return NULL;
 
   return ds_deque_pop_front(queue->deque);
 }
@@ -119,8 +115,7 @@ void *ds_queue_pop(ds_queue_t *queue) {
  * @return Pointer to the removed element, or NULL if the queue is empty.
  */
 void *ds_queue_front(ds_queue_t *queue) {
-  if (!queue)
-    return NULL;
+  if (!queue) return NULL;
 
   return ds_deque_front(queue->deque);
 }
@@ -135,9 +130,7 @@ void *ds_queue_front(ds_queue_t *queue) {
  *                     freeing the associated memory.
  */
 void ds_queue_clear(ds_queue_t *queue, ds_free_f free_func) {
-  if (!queue)
-    return;
+  if (!queue) return;
 
   ds_deque_clear(queue->deque, free_func);
 }
-

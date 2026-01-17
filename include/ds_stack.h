@@ -55,8 +55,7 @@ bool ds_stack_is_empty(ds_stack_t *stack);
  *
  * @return
  *   - DS_OK         On success.
- *   - DS_ERR_BOUNDS Invalid parameters.
- *   - DS_ERR_MEM    Memory allocation fails.
+ *   - DS_ERR_*      On failure.
  */
 ds_status_t ds_stack_push(ds_stack_t *stack, void *element);
 

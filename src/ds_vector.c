@@ -62,8 +62,7 @@ ds_vector_t *ds_vector_create(size_t capacity_hint) {
  */
 void ds_vector_destroy(ds_vector_t *vec, ds_free_f free_func) {
   // Check input paraments
-  if (!vec)
-    return;
+  if (!vec) return;
 
   // A specific function is passed
   if (free_func) {
@@ -82,8 +81,7 @@ void ds_vector_destroy(ds_vector_t *vec, ds_free_f free_func) {
  */
 size_t ds_vector_size(const ds_vector_t *vec) {
   // Check input paraments
-  if (!vec)
-    return 0;
+  if (!vec) return 0;
 
   return vec->size;
 }
@@ -93,8 +91,7 @@ size_t ds_vector_size(const ds_vector_t *vec) {
  */
 size_t ds_vector_capacity(const ds_vector_t *vec) {
   // Check input paraments
-  if (!vec)
-    return 0;
+  if (!vec) return 0;
   
   return vec->capacity;
 }
@@ -104,8 +101,7 @@ size_t ds_vector_capacity(const ds_vector_t *vec) {
  */
 bool ds_vector_is_empty(const ds_vector_t *vec) {
   // Check input paraments
-  if (!vec)
-    return true;
+  if (!vec) return true;
   
   return vec->size == 0;
 }
@@ -127,11 +123,9 @@ bool ds_vector_is_empty(const ds_vector_t *vec) {
  */
 ds_status_t ds_vector_reserve(ds_vector_t *vec, size_t new_capacity) {
   // Check input paraments
-  if (!vec || new_capacity < vec->size) 
-    return DS_ERR_BOUNDS;
-
-  if (new_capacity <= vec->capacity)
-    return DS_OK;
+  if (!vec) return DS_ERR_NULL;
+  if ( new_capacity < vec->size) return DS_ERR_BOUNDS;
+  if (new_capacity <= vec->capacity) return DS_OK;
 
   void **new_items = realloc(vec->items, sizeof(void *) * new_capacity);
   if (!new_items)
@@ -153,8 +147,7 @@ ds_status_t ds_vector_reserve(ds_vector_t *vec, size_t new_capacity) {
  */
 void *ds_vector_get(const ds_vector_t *vec, size_t index) {
   // Check input paraments 
-  if (!vec || index >= vec->size)
-    return NULL;
+  if (!vec || index >= vec->size) return NULL;
 
   return vec->items[index];
 }
@@ -176,8 +169,9 @@ void *ds_vector_get(const ds_vector_t *vec, size_t index) {
  */
 ds_status_t ds_vector_set(ds_vector_t *vec, size_t index, void *element, ds_free_f old_element_free) {
   // Check input paraments
-  if (!vec || index >= vec->size || !element)
-    return DS_ERR_BOUNDS;
+  if (!vec) return DS_ERR_NULL;
+  if (index >= vec->size) return DS_ERR_BOUNDS;
+  if (!element) return DS_ERR_ARG;
   
   // Replace first, destroy later
   // Copy -> Update -> Destroy
@@ -204,8 +198,8 @@ ds_status_t ds_vector_set(ds_vector_t *vec, size_t index, void *element, ds_free
  */
 ds_status_t ds_vector_push_back(ds_vector_t *vec, void *element) {
   // Check input paraments
-  if (!vec || !element)
-    return DS_ERR_BOUNDS;
+  if (!vec) return DS_ERR_NULL;
+  if (!element) return DS_ERR_ARG;
 
   return ds_vector_insert(vec, vec->size, element);
 }
@@ -226,8 +220,9 @@ ds_status_t ds_vector_push_back(ds_vector_t *vec, void *element) {
  */
 ds_status_t ds_vector_insert(ds_vector_t *vec, size_t index, void *element) {
   // Check input paraments
-  if (!vec ||index > vec->size || !element)
-    return DS_ERR_BOUNDS;
+  if (!vec) return DS_ERR_NULL;
+  if (index > vec->size) return DS_ERR_BOUNDS;
+  if (!element) return DS_ERR_ARG;
 
   // Check the capacity of vector
   if (vec->size == vec->capacity) {
@@ -265,8 +260,7 @@ ds_status_t ds_vector_insert(ds_vector_t *vec, size_t index, void *element) {
  */
 void *ds_vector_pop_back(ds_vector_t *vec) {
   // Check input paraments
-  if (!vec || vec->size == 0) 
-    return NULL;
+  if (!vec || vec->size == 0) return NULL;
 
   void *val = vec->items[vec->size-1];
   vec->size --;
@@ -291,8 +285,8 @@ void *ds_vector_pop_back(ds_vector_t *vec) {
 
 ds_status_t ds_vector_remove(ds_vector_t *vec, size_t index, ds_free_f free_func) {
   // Check input paraments 
-  if (!vec || index >= vec->size) 
-    return DS_ERR_BOUNDS;
+  if (!vec) return DS_ERR_NULL;
+  if (index >= vec->size) return DS_ERR_BOUNDS;
 
   // Copy
   void *tmp = vec->items[index];
@@ -323,8 +317,7 @@ ds_status_t ds_vector_remove(ds_vector_t *vec, size_t index, ds_free_f free_func
  */
 void ds_vector_clear(ds_vector_t *vec, ds_free_f free_func) {
   // Check input paraments
-  if (!vec)
-    return;
+  if (!vec) return;
 
   if (free_func) {
     for (size_t i = 0; i < vec->size; ++ i) {

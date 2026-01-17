@@ -25,8 +25,7 @@ struct ds_list {
  */
 ds_list_t *ds_list_create() {
   ds_list_t *list = malloc(sizeof(ds_list_t));
-  if (!list)
-    return NULL;
+  if (!list) return NULL;
 
   list->head = NULL;
   list->tail = NULL;
@@ -45,8 +44,7 @@ ds_list_t *ds_list_create() {
  */
 void ds_list_destroy(ds_list_t *list, ds_free_f free_func) {
   // Check input parameters
-  if (!list)
-    return;
+  if (!list) return;
   
   // Iterate each node for free
   ds_list_node_t *p = list->head;
@@ -70,8 +68,7 @@ void ds_list_destroy(ds_list_t *list, ds_free_f free_func) {
  */
 size_t ds_list_size(const ds_list_t *list) {
   // Check input parameters
-  if (!list)
-    return 0;
+  if (!list) return 0;
 
   return list->size;
 }
@@ -81,8 +78,7 @@ size_t ds_list_size(const ds_list_t *list) {
  */
 bool ds_list_is_empty(const ds_list_t *list) {
   // Check input parameters
-  if (!list)
-    return true;
+  if (!list) return true;
 
   return list->size == 0;
 }
@@ -100,19 +96,19 @@ bool ds_list_is_empty(const ds_list_t *list) {
  *
  * @return 
  *  - DS_OK         On success.
- *  - DS_ERR_BOUNDS Invalid parameters.
+ *  - DS_ERR_*      On failure.
  */
 ds_status_t ds_list_set(ds_list_t *list, ds_list_iter_t it, void *element, ds_free_f old_element_free) {
   // Check input parameters
-  if (!list || !it || !element)
-    return DS_ERR_BOUNDS;
+  if (!list) return DS_ERR_NULL;
+  if (!it || !element) return DS_ERR_ARG;
   
   // Copy
   void *old_element = it->data;
   // Update
   it->data = element;
   // Free
-  old_element_free(old_element);
+  if (old_element_free) old_element_free(old_element);
 
   return DS_OK;
 }
@@ -123,15 +119,14 @@ ds_status_t ds_list_set(ds_list_t *list, ds_list_iter_t it, void *element, ds_fr
  * @param list     Pointer to the list.
  * @param element  Pointer to the element to append.
  *
- * @return
- *   - DS_OK         On success.
- *   - DS_ERR_BOUNDS Invalid parameters.
- *   - DS_ERR_MEM    Memory allocation fails.
+ * @return 
+ *  - DS_OK         On success.
+ *  - DS_ERR_*      On failure.
  */
 ds_status_t ds_list_push_back(ds_list_t *list, void *element) { 
   // Check input parameters
-  if (!list || !element) 
-    return DS_ERR_BOUNDS;
+  if (!list) return DS_ERR_NULL;
+  if (!element) return DS_ERR_ARG;
 
   return ds_list_insert(list, NULL, element);
 }
@@ -142,15 +137,14 @@ ds_status_t ds_list_push_back(ds_list_t *list, void *element) {
  * @param list     Pointer to the list.
  * @param element  Pointer to the element to append.
  *
- * @return
- *   - DS_OK         On success.
- *   - DS_ERR_BOUNDS Invalid parameters.
- *   - DS_ERR_MEM    Memory allocation fails.
+ * @return 
+ *  - DS_OK         On success.
+ *  - DS_ERR_*      On failure.
  */
 ds_status_t ds_list_push_front(ds_list_t *list, void *element) {
   // Check input parameters
-  if (!list || !element) 
-    return DS_ERR_BOUNDS;
+  if (!list) return DS_ERR_NULL;
+  if (!element) return DS_ERR_ARG;
 
   return ds_list_insert(list, list->head, element);
 }
@@ -165,15 +159,14 @@ ds_status_t ds_list_push_front(ds_list_t *list, void *element) {
  *                 - Otherwise, insert a new node before the node pointed to by it.
  * @param element  Pointer to the element to insert.
  *
- * @return
- *   - DS_OK         On success.
- *   - DS_ERR_BOUNDS Invalid parameters.
- *   - DS_ERR_MEM    Memory allocation fails.
+ * @return 
+ *  - DS_OK         On success.
+ *  - DS_ERR_*      On failure.
  */
 ds_status_t ds_list_insert(ds_list_t *list, ds_list_iter_t it, void *element) {
   // Check input parameters
-  if (!list || !element)
-    return DS_ERR_BOUNDS;
+  if (!list) return DS_ERR_NULL;
+  if (!element) return DS_ERR_ARG;
 
   // Construct a new node
   ds_list_node_t *node = malloc(sizeof(ds_list_node_t));
@@ -234,8 +227,7 @@ ds_status_t ds_list_insert(ds_list_t *list, ds_list_iter_t it, void *element) {
  */
 void *ds_list_pop_back(ds_list_t *list) {
   // Check input parameters
-  if (!list)
-    return NULL;
+  if (!list || list->size == 0) return NULL;
 
   // Copy
   ds_list_node_t *tmp = list->tail;
@@ -277,8 +269,7 @@ void *ds_list_pop_back(ds_list_t *list) {
  */
 void *ds_list_pop_front(ds_list_t *list) {
   // Check input parameters
-  if (!list)
-    return NULL;
+  if (!list || list->size == 0) return NULL;
 
   // Copy
   ds_list_node_t *tmp = list->head;
@@ -299,6 +290,7 @@ void *ds_list_pop_front(ds_list_t *list) {
 
   // Free
   free(tmp);
+  list->size --;
 
   return ret;
 }
@@ -320,8 +312,7 @@ void *ds_list_pop_front(ds_list_t *list) {
  */
 ds_list_iter_t ds_list_remove(ds_list_t *list, ds_list_iter_t it, ds_free_f free_func) {
   // Check input parameters
-  if (!list || !it)
-    return NULL;
+  if (!list || !it) return NULL;
 
   ds_list_node_t *ret, *tmp;
   
@@ -383,8 +374,7 @@ ds_list_iter_t ds_list_remove(ds_list_t *list, ds_list_iter_t it, ds_free_f free
  */
 void ds_list_clear(ds_list_t *list, ds_free_f free_func) {
   // Check input parameters
-  if (!list)
-    return;
+  if (!list) return;
 
   // Traverse each node for free
   ds_list_node_t *p = list->head;
@@ -414,8 +404,7 @@ void ds_list_clear(ds_list_t *list, ds_free_f free_func) {
  */
 ds_list_iter_t ds_list_iter_begin(ds_list_t *list) {
   // Check input parameters
-  if (!list || list->size == 0)
-    return NULL;
+  if (!list || list->size == 0) return NULL;
 
   return list->head;
 }
@@ -441,8 +430,7 @@ ds_list_iter_t ds_list_iter_end(ds_list_t *list) {
  */
 ds_list_iter_t ds_list_iter_tail(ds_list_t *list) {
   // Check input parameters
-  if (!list || list->size == 0)
-    return NULL;
+  if (!list || list->size == 0) return NULL;
 
   return list->tail;
 }
@@ -457,8 +445,7 @@ ds_list_iter_t ds_list_iter_tail(ds_list_t *list) {
  */
 ds_list_iter_t ds_list_iter_next(ds_list_iter_t it) {
   // Check input parameters
-  if (!it)
-    return NULL;
+  if (!it) return NULL;
   
   return it->next;
 }
@@ -473,8 +460,7 @@ ds_list_iter_t ds_list_iter_next(ds_list_iter_t it) {
  */
 ds_list_iter_t ds_list_iter_prev(ds_list_iter_t it) {
   // Check input parameters
-  if (!it)
-    return NULL;
+  if (!it) return NULL;
 
   return it->prev;
 }
@@ -488,8 +474,7 @@ ds_list_iter_t ds_list_iter_prev(ds_list_iter_t it) {
  */
 void *ds_list_iter_get(ds_list_iter_t it) {
   // Check input parameters
-  if (!it)
-    return NULL;
+  if (!it) return NULL;
 
   return it->data;
 }
@@ -503,8 +488,7 @@ void *ds_list_iter_get(ds_list_iter_t it) {
  */
 bool ds_list_iter_equal(const ds_list_iter_t a, const ds_list_iter_t b) {
   // Check input parameters
-  if (!a || !b)
-    return false;
+  if (!a || !b) return false;
 
   return a == b; 
 }

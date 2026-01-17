@@ -58,8 +58,8 @@ bool ds_heap_is_empty(const ds_heap_t *heap);
  * @param element  Pointer to the element to insert.
  *
  * @return
- *   - DS_OK on success.
- *   - DS_ERR_MEM if memory allocation fails.
+ *   - DS_OK         On success.
+ *   - DS_ERR_*      On failure.
  */
 ds_status_t ds_heap_push(ds_heap_t *heap, void *element);
 

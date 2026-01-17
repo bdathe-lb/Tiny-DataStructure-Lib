@@ -36,8 +36,7 @@ struct ds_heap {
  */
 static void shift_up(ds_heap_t *heap) {
   // Check input parameters
-  if (!heap || heap->size == 0)
-    return;
+  if (!heap || heap->size == 0) return;
 
   size_t i = heap->size - 1;
   void *x = heap->items[i];
@@ -64,8 +63,7 @@ static void shift_up(ds_heap_t *heap) {
  */
 static void shift_down(ds_heap_t *heap) {
   // Check input parameters
-  if (!heap || heap->size == 0) 
-    return;
+  if (!heap || heap->size == 0) return;
 
   size_t n = heap->size;
   size_t i = 0;
@@ -113,8 +111,7 @@ static void shift_down(ds_heap_t *heap) {
  */
 ds_heap_t *ds_heap_create(ds_compare_f compare, size_t capacity_hint) {
   // Check input param
-  if (!compare) 
-    return NULL;
+  if (!compare) return NULL;
 
   size_t capacity = capacity_hint == 0 ?
                     DS_HEAP_DEFAULT_CAPACITY :
@@ -149,8 +146,7 @@ ds_heap_t *ds_heap_create(ds_compare_f compare, size_t capacity_hint) {
  */
 void ds_heap_destroy(ds_heap_t *heap, ds_free_f free_func) {
   // Check input param
-  if (!heap)
-    return;
+  if (!heap) return;
 
   // Traverse each array node for free
   if (free_func) {
@@ -159,6 +155,7 @@ void ds_heap_destroy(ds_heap_t *heap, ds_free_f free_func) {
     }
   }
 
+  free(heap->items);
   free(heap);
   return;
 }
@@ -167,8 +164,7 @@ void ds_heap_destroy(ds_heap_t *heap, ds_free_f free_func) {
  * @brief Get the current number of elements.
  */
 size_t ds_heap_size(const ds_heap_t *heap) {
-  if (!heap)
-    return 0;
+  if (!heap) return 0;
 
   return heap->size;
 }
@@ -177,8 +173,7 @@ size_t ds_heap_size(const ds_heap_t *heap) {
  * @brief Get the currently allocated capacity.
  */
 size_t ds_heap_capacity(const ds_heap_t *heap) {
-  if (!heap)
-    return 0;
+  if (!heap) return 0;
 
   return heap->capacity;
 }
@@ -187,8 +182,7 @@ size_t ds_heap_capacity(const ds_heap_t *heap) {
  * @brief Check if the heap is empty.
  */
 bool ds_heap_is_empty(const ds_heap_t *heap) {
-  if (!heap)
-    return true;
+  if (!heap) return true;
 
   return heap->size == 0;
 }
@@ -200,20 +194,19 @@ bool ds_heap_is_empty(const ds_heap_t *heap) {
  * @param element  Pointer to the element to insert.
  *
  * @return
- *   - DS_OK on success.
- *   - DS_ERR_MEM if memory allocation fails.
+ *   - DS_OK         On success.
+ *   - DS_ERR_*      On failure.
  */
 ds_status_t ds_heap_push(ds_heap_t *heap, void *element) {
-  if (!heap || !element)
-    return DS_ERR_BOUNDS;
+  if (!heap) return DS_ERR_NULL;
+  if (!element) return DS_ERR_ARG;
 
   // Check capacity of the heap whether full
   if (heap->size == heap->capacity) {
     // Expand capacity
     size_t new_cap = heap->capacity * DS_HEAP_GROWTH_FACTOR;
     void **new_arr = realloc(heap->items, sizeof(void *) * new_cap);
-    if (!new_arr)
-      return DS_ERR_MEM;
+    if (!new_arr) return DS_ERR_MEM;
 
     heap->items = new_arr;
     heap->capacity = new_cap;
@@ -240,8 +233,7 @@ ds_status_t ds_heap_push(ds_heap_t *heap, void *element) {
  */
 void *ds_heap_pop(ds_heap_t *heap) {
   // Check input parameters
-  if (!heap || heap->size == 0)
-    return NULL;
+  if (!heap || heap->size == 0) return NULL;
 
   // Store the top element
   void *ret = heap->items[0];
@@ -266,8 +258,7 @@ void *ds_heap_pop(ds_heap_t *heap) {
  */
 void *ds_heap_top(ds_heap_t *heap) {
   // Check input parameters
-  if (!heap || heap->size == 0)
-    return NULL;
+  if (!heap || heap->size == 0) return NULL;
   
   return heap->items[0];
 }
@@ -283,8 +274,7 @@ void *ds_heap_top(ds_heap_t *heap) {
  */
 void ds_heap_clear(ds_heap_t *heap, ds_free_f free_func) {
   // Check input parameters
-  if (!heap || heap->size == 0)
-    return;
+  if (!heap || heap->size == 0) return;
 
   if (free_func) {
     for (size_t i = 0; i < heap->size; ++ i) {
