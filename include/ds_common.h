@@ -20,9 +20,10 @@ typedef enum {
     DS_ERR_BOUNDS = -3,             // Out of bounds: index >= size, or index > size(for insertion), etc.
     DS_ERR_EMPTY  = -4,             // Empty container (e.g., pop_front on empty, as required by API)
     DS_ERR_EXIST  = -5,             // A resource already exists
+    DS_ERR_NOT_FOUND = -6,
 
     /* Resource/System Errors */
-    DS_ERR_MEM    = -6,             // Memory allocation failed
+    DS_ERR_MEM    = -7,             // Memory allocation failed
 } ds_status_t;
 
 /*
